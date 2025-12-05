@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIDI Player - TabPlayer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <a href="index.html" class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18V5l12-2v13"/>
+                    <circle cx="6" cy="18" r="3"/>
+                    <circle cx="18" cy="16" r="3"/>
+                </svg>
+                <span class="logo-text">TabPlayer</span>
+            </a>
+            <div class="track-info">
+                <h1 class="track-title" id="trackTitle">Load a Guitar Pro File</h1>
+                <p class="track-artist" id="trackArtist">Select a .gp file to begin</p>
+            </div>
+            <div class="header-actions">
+                <label class="file-input-wrapper">
+                    <input type="file" id="fileInput" accept=".gp,.gp3,.gp4,.gp5,.gpx" hidden>
+                    <span class="file-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17,8 12,3 7,8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Open File
+                    </span>
+                </label>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Track Selector Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <h2>Tracks</h2>
+                </div>
+                <div class="track-list" id="trackList">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                        <p>No tracks loaded</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Notation Display -->
+            <div class="notation-wrapper">
+                <div class="notation-container" id="alphaTab">
+                    <div class="welcome-screen" id="welcomeScreen">
+                        <div class="welcome-content">
+                            <div class="welcome-icon">
+                                <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect x="8" y="10" width="64" height="60" rx="4"/>
+                                    <line x1="8" y1="25" x2="72" y2="25"/>
+                                    <line x1="8" y1="35" x2="72" y2="35"/>
+                                    <line x1="8" y1="45" x2="72" y2="45"/>
+                                    <line x1="8" y1="55" x2="72" y2="55"/>
+                                    <circle cx="25" cy="30" r="3" fill="currentColor"/>
+                                    <circle cx="45" cy="40" r="3" fill="currentColor"/>
+                                    <circle cx="35" cy="50" r="3" fill="currentColor"/>
+                                    <circle cx="55" cy="35" r="3" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <h2>MIDI Player</h2>
+                            <p>Load a Guitar Pro file to view and play with synthesized audio</p>
+                            <div class="supported-formats">
+                                <span>.gp</span>
+                                <span>.gp3</span>
+                                <span>.gp4</span>
+                                <span>.gp5</span>
+                                <span>.gpx</span>
+                            </div>
+                            <button class="welcome-btn" onclick="document.getElementById('fileInput').click()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17,8 12,3 7,8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                Choose File
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Player Controls -->
+        <footer class="player-controls">
+            <div class="controls-left">
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span class="time-separator">/</span>
+                    <span id="totalTime">0:00</span>
+                </div>
+            </div>
+
+            <div class="controls-center">
+                <button class="control-btn" id="stopBtn" title="Stop">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="6" width="12" height="12" rx="1"/>
+                    </svg>
+                </button>
+                <button class="control-btn play-btn" id="playPauseBtn" title="Play/Pause">
+                    <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5,3 19,12 5,21"/>
+                    </svg>
+                    <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                        <rect x="6" y="4" width="4" height="16" rx="1"/>
+                        <rect x="14" y="4" width="4" height="16" rx="1"/>
+                    </svg>
+                </button>
+                <button class="control-btn" id="loopBtn" title="Loop">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="17,1 21,5 17,9"/>
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                        <polyline points="7,23 3,19 7,15"/>
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                    </svg>
+                </button>
+                <button class="control-btn active" id="metronomeBtn" title="Metronome">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L8 22h8L12 2z"/>
+                        <line x1="12" y1="8" x2="18" y2="4"/>
+                        <circle cx="18" cy="4" r="2"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="controls-right">
+                <div class="tempo-control">
+                    <label>Tempo</label>
+                    <div class="tempo-slider-wrapper">
+                        <input type="range" id="tempoSlider" min="25" max="200" value="100">
+                        <span id="tempoValue">100%</span>
+                    </div>
+                </div>
+                <div class="volume-control">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                    </svg>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="80">
+                </div>
+            </div>
+        </footer>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-cursor" id="progressCursor"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Loading notation...</p>
+    </div>
+
+    <script src="player.js"></script>
+</body>
+</html>
+

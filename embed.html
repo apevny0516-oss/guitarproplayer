@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TabPlayer Embed</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #1a1d23;
+            --bg-secondary: #22262e;
+            --bg-controls: #2a2f38;
+            --accent: #4f9eff;
+            --accent-hover: #6aadff;
+            --text-primary: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border: rgba(255,255,255,0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        .embed-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 300px;
+        }
+        
+        /* Header */
+        .embed-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        
+        .embed-logo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .embed-logo svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .embed-title {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .track-select {
+            padding: 4px 8px;
+            background: var(--bg-controls);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        
+        /* Notation Area */
+        .notation-area {
+            flex: 1;
+            overflow: auto;
+            background: var(--bg-primary);
+        }
+        
+        .notation-area::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .notation-area::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        .notation-area::-webkit-scrollbar-thumb {
+            background: var(--bg-controls);
+            border-radius: 4px;
+        }
+        
+        /* Loading State */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--bg-controls);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 12px;
+            color: #ff6b6b;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .error-state svg {
+            width: 40px;
+            height: 40px;
+            opacity: 0.7;
+        }
+        
+        .error-state .fallback-upload {
+            margin-top: 8px;
+        }
+        
+        .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            background: var(--accent);
+            border: none;
+            border-radius: 6px;
+            color: var(--bg-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .upload-btn:hover {
+            background: var(--accent-hover);
+        }
+        
+        .upload-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Controls */
+        .embed-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        
+        .control-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-controls);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .control-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .control-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .control-btn:disabled:hover {
+            background: var(--bg-controls);
+            border-color: var(--border);
+        }
+        
+        .control-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .control-btn.play-btn {
+            width: 44px;
+            height: 44px;
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .control-btn.play-btn:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+        
+        .control-btn.play-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .control-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .time-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-left: 8px;
+        }
+        
+        .progress-wrapper {
+            flex: 1;
+            height: 6px;
+            background: var(--bg-controls);
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 0 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        
+        .tempo-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .tempo-control label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        
+        .tempo-control input[type="range"] {
+            width: 60px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: var(--bg-controls);
+            border-radius: 2px;
+        }
+        
+        .tempo-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .tempo-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            min-width: 32px;
+        }
+        
+        /* AlphaTab Overrides */
+        .at-surface {
+            background: transparent !important;
+        }
+        
+        .at-cursor-bar {
+            background: rgba(79, 158, 255, 0.15) !important;
+        }
+        
+        .at-cursor-beat {
+            background: var(--accent) !important;
+            opacity: 0.5;
+        }
+        
+        .at-selection div {
+            background: rgba(79, 158, 255, 0.1) !important;
+        }
+        
+        /* Responsive */
+        @media (max-width: 500px) {
+            .embed-header {
+                padding: 8px 12px;
+            }
+            
+            .embed-logo span {
+                display: none;
+            }
+            
+            .embed-controls {
+                padding: 8px 12px;
+                flex-wrap: wrap;
+            }
+            
+            .tempo-control {
+                order: 10;
+                width: 100%;
+                justify-content: center;
+                margin-top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="embed-container">
+        <!-- Header -->
+        <header class="embed-header">
+            <div class="embed-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18V5l12-2v13"/>
+                    <circle cx="6" cy="18" r="3"/>
+                    <circle cx="18" cy="16" r="3"/>
+                </svg>
+                <span>TabPlayer</span>
+            </div>
+            <div class="embed-title" id="songTitle">Loading...</div>
+            <select class="track-select" id="trackSelect" disabled>
+                <option>Loading...</option>
+            </select>
+        </header>
+        
+        <!-- Notation -->
+        <div class="notation-area" id="alphaTab">
+            <div class="loading-state" id="loadingState">
+                <div class="spinner"></div>
+                <span>Loading notation...</span>
+            </div>
+            <div class="error-state" id="errorState">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <span id="errorMessage">Failed to load file</span>
+                <div class="fallback-upload">
+                    <input type="file" id="fallbackFileInput" accept=".gp,.gp3,.gp4,.gp5,.gpx" hidden>
+                    <button class="upload-btn" id="fallbackUploadBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17,8 12,3 7,8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Upload File Instead
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Controls -->
+        <footer class="embed-controls">
+            <button class="control-btn" id="stopBtn" disabled title="Stop">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="6" width="12" height="12" rx="1"/>
+                </svg>
+            </button>
+            <button class="control-btn play-btn" id="playPauseBtn" disabled title="Play/Pause">
+                <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5,3 19,12 5,21"/>
+                </svg>
+                <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+                    <rect x="6" y="4" width="4" height="16" rx="1"/>
+                    <rect x="14" y="4" width="4" height="16" rx="1"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="loopBtn" disabled title="Loop">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="17,1 21,5 17,9"/>
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                    <polyline points="7,23 3,19 7,15"/>
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="metronomeBtn" disabled title="Metronome">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L8 22h8L12 2z"/>
+                    <line x1="12" y1="8" x2="18" y2="4"/>
+                </svg>
+            </button>
+            
+            <span class="time-display">
+                <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+            </span>
+            
+            <div class="progress-wrapper" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="tempo-control">
+                <label>Speed</label>
+                <input type="range" id="tempoSlider" min="25" max="200" value="100">
+                <span class="tempo-value" id="tempoValue">100%</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        class EmbedPlayer {
+            constructor() {
+                this.api = null;
+                this.score = null;
+                this.isPlaying = false;
+                this.isLooping = false;
+                this.metronomeEnabled = true;
+                
+                this.elements = {
+                    container: document.getElementById('alphaTab'),
+                    loadingState: document.getElementById('loadingState'),
+                    errorState: document.getElementById('errorState'),
+                    errorMessage: document.getElementById('errorMessage'),
+                    fallbackFileInput: document.getElementById('fallbackFileInput'),
+                    fallbackUploadBtn: document.getElementById('fallbackUploadBtn'),
+                    songTitle: document.getElementById('songTitle'),
+                    trackSelect: document.getElementById('trackSelect'),
+                    playPauseBtn: document.getElementById('playPauseBtn'),
+                    stopBtn: document.getElementById('stopBtn'),
+                    loopBtn: document.getElementById('loopBtn'),
+                    metronomeBtn: document.getElementById('metronomeBtn'),
+                    currentTime: document.getElementById('currentTime'),
+                    totalTime: document.getElementById('totalTime'),
+                    progressFill: document.getElementById('progressFill'),
+                    progressBar: document.getElementById('progressBar'),
+                    tempoSlider: document.getElementById('tempoSlider'),
+                    tempoValue: document.getElementById('tempoValue')
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.initAlphaTab();
+                this.bindEvents();
+                this.loadFileFromUrl();
+            }
+            
+            initAlphaTab() {
+                const settings = {
+                    core: {
+                        fontDirectory: 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/font/',
+                        file: null,
+                        tracks: 'all'
+                    },
+                    display: {
+                        staveProfile: 'Default',
+                        layoutMode: 'Page',
+                        scale: 0.9,
+                        resources: {
+                            staffLineColor: '#3d4450',
+                            barSeparatorColor: '#3d4450',
+                            mainGlyphColor: '#e8eaed',
+                            secondaryGlyphColor: '#9aa0a6',
+                            scoreInfoColor: '#e8eaed',
+                            barNumberColor: '#9aa0a6'
+                        }
+                    },
+                    notation: {
+                        elements: {
+                            scoreTitle: false,
+                            scoreSubTitle: false,
+                            scoreArtist: false,
+                            scoreAlbum: false,
+                            scoreWords: false,
+                            scoreMusic: false,
+                            scoreCopyright: false,
+                            guitarTuning: true
+                        }
+                    },
+                    player: {
+                        enablePlayer: true,
+                        enableCursor: true,
+                        enableUserInteraction: true,
+                        soundFont: 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/soundfont/sonivox.sf2',
+                        scrollElement: this.elements.container,
+                        scrollMode: 'Continuous'
+                    }
+                };
+                
+                this.api = new alphaTab.AlphaTabApi(this.elements.container, settings);
+                
+                this.api.scoreLoaded.on((score) => this.onScoreLoaded(score));
+                this.api.playerReady.on(() => this.onPlayerReady());
+                this.api.playerStateChanged.on((e) => this.onPlayerStateChanged(e));
+                this.api.playerPositionChanged.on((e) => this.onPositionChanged(e));
+                this.api.error.on((e) => this.onError(e));
+            }
+            
+            bindEvents() {
+                // Fallback file upload
+                this.elements.fallbackUploadBtn.addEventListener('click', () => {
+                    this.elements.fallbackFileInput.click();
+                });
+                
+                this.elements.fallbackFileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.loadLocalFile(file);
+                    }
+                });
+                
+                this.elements.playPauseBtn.addEventListener('click', () => this.api.playPause());
+                this.elements.stopBtn.addEventListener('click', () => this.api.stop());
+                
+                this.elements.loopBtn.addEventListener('click', () => {
+                    this.isLooping = !this.isLooping;
+                    this.api.isLooping = this.isLooping;
+                    this.elements.loopBtn.classList.toggle('active', this.isLooping);
+                });
+                
+                this.elements.metronomeBtn.addEventListener('click', () => {
+                    this.metronomeEnabled = !this.metronomeEnabled;
+                    this.api.metronomeVolume = this.metronomeEnabled ? 1 : 0;
+                    this.elements.metronomeBtn.classList.toggle('active', this.metronomeEnabled);
+                });
+                
+                this.elements.tempoSlider.addEventListener('input', (e) => {
+                    const value = parseInt(e.target.value);
+                    this.elements.tempoValue.textContent = `${value}%`;
+                    this.api.playbackSpeed = value / 100;
+                });
+                
+                this.elements.progressBar.addEventListener('click', (e) => {
+                    if (!this.api.tickCache) return;
+                    const rect = this.elements.progressBar.getBoundingClientRect();
+                    const percent = (e.clientX - rect.left) / rect.width;
+                    const endTick = this.api.tickCache.masterBars[this.api.tickCache.masterBars.length - 1].end;
+                    this.api.tickPosition = Math.floor(endTick * percent);
+                });
+                
+                this.elements.trackSelect.addEventListener('change', (e) => {
+                    const index = parseInt(e.target.value);
+                    if (!isNaN(index) && this.score) {
+                        this.api.renderTracks([this.score.tracks[index]]);
+                    }
+                });
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        this.api.playPause();
+                    }
+                });
+            }
+            
+            loadFileFromUrl() {
+                const params = new URLSearchParams(window.location.search);
+                const fileUrl = params.get('file');
+                
+                if (!fileUrl) {
+                    this.showError('No file URL specified', true);
+                    return;
+                }
+                
+                // Try to load the file via alphaTab
+                // This may fail due to CORS restrictions
+                try {
+                    this.api.load(fileUrl);
+                } catch (err) {
+                    this.showError(`Failed to load: ${err.message}`, true);
+                }
+            }
+            
+            loadLocalFile(file) {
+                // Hide error state, show loading
+                this.elements.errorState.style.display = 'none';
+                this.elements.loadingState.style.display = 'flex';
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    this.api.load(data);
+                };
+                reader.onerror = () => {
+                    this.showError('Failed to read file', true);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+            
+            onScoreLoaded(score) {
+                this.score = score;
+                this.elements.loadingState.style.display = 'none';
+                
+                // Update title
+                const title = score.title || 'Untitled';
+                this.elements.songTitle.textContent = title;
+                document.title = title + ' - TabPlayer';
+                
+                // Populate track selector
+                this.elements.trackSelect.innerHTML = '';
+                score.tracks.forEach((track, i) => {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = track.name || `Track ${i + 1}`;
+                    this.elements.trackSelect.appendChild(opt);
+                });
+                this.elements.trackSelect.disabled = false;
+            }
+            
+            onPlayerReady() {
+                this.elements.playPauseBtn.disabled = false;
+                this.elements.stopBtn.disabled = false;
+                this.elements.loopBtn.disabled = false;
+                this.elements.metronomeBtn.disabled = false;
+                
+                // Enable metronome by default
+                this.api.metronomeVolume = 1;
+                this.elements.metronomeBtn.classList.add('active');
+            }
+            
+            onPlayerStateChanged(e) {
+                this.isPlaying = e.state === 1;
+                const playIcon = this.elements.playPauseBtn.querySelector('.play-icon');
+                const pauseIcon = this.elements.playPauseBtn.querySelector('.pause-icon');
+                playIcon.style.display = this.isPlaying ? 'none' : 'block';
+                pauseIcon.style.display = this.isPlaying ? 'block' : 'none';
+            }
+            
+            onPositionChanged(e) {
+                this.elements.currentTime.textContent = this.formatTime(e.currentTime / 1000);
+                this.elements.totalTime.textContent = this.formatTime(e.endTime / 1000);
+                const percent = (e.currentTime / e.endTime) * 100;
+                this.elements.progressFill.style.width = `${percent}%`;
+            }
+            
+            onError(e) {
+                const message = e.message || 'An error occurred';
+                // CORS errors often show as generic errors
+                const isCorsLikely = message.includes('Failed') || message.includes('error') || message.includes('Load');
+                this.showError(message, isCorsLikely);
+            }
+            
+            showError(message, showUpload = true) {
+                this.elements.loadingState.style.display = 'none';
+                this.elements.errorState.style.display = 'flex';
+                this.elements.errorMessage.textContent = message;
+                
+                // Show upload button for CORS-like errors
+                const fallbackDiv = this.elements.errorState.querySelector('.fallback-upload');
+                if (fallbackDiv) {
+                    fallbackDiv.style.display = showUpload ? 'block' : 'none';
+                }
+            }
+            
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+        }
+        
+        // Initialize
+        new EmbedPlayer();
+    </script>
+</body>
+</html>
+

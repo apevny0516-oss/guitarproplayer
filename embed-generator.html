@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embed Generator - TabPlayer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        html, body {
+            height: auto;
+            overflow: auto;
+        }
+        
+        .generator-container {
+            min-height: 100vh;
+            background: 
+                radial-gradient(ellipse at 30% 0%, rgba(79, 158, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 100%, rgba(0, 212, 170, 0.06) 0%, transparent 50%),
+                var(--bg-primary);
+        }
+        
+        .generator-header {
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        
+        .back-link:hover {
+            color: var(--text-primary);
+        }
+        
+        .back-link svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .generator-main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--text-primary), #4f9eff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .page-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+        
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .step-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .step-number {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4f9eff, #00d4aa);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--bg-primary);
+        }
+        
+        .step-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .step-content {
+            padding-left: 44px;
+        }
+        
+        .step-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+        
+        /* File URL Input */
+        .url-input-group {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .url-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .url-input:focus {
+            outline: none;
+            border-color: #4f9eff;
+        }
+        
+        .url-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .generate-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #4f9eff, #00d4aa);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(79, 158, 255, 0.3);
+        }
+        
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Size Options */
+        .size-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .size-option {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .size-option:hover {
+            border-color: var(--text-muted);
+        }
+        
+        .size-option.selected {
+            border-color: #4f9eff;
+            background: rgba(79, 158, 255, 0.1);
+        }
+        
+        .size-option input {
+            display: none;
+        }
+        
+        .size-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        
+        .size-dims {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Embed Code Output */
+        .embed-output {
+            position: relative;
+        }
+        
+        .code-block {
+            padding: 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #4f9eff;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            min-height: 80px;
+        }
+        
+        .code-block.placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 8px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .copy-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+        
+        .copy-btn.copied {
+            background: #00d4aa;
+            border-color: #00d4aa;
+            color: var(--bg-primary);
+        }
+        
+        .copy-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        /* Preview */
+        .preview-container {
+            margin-top: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--bg-tertiary);
+        }
+        
+        .preview-header {
+            padding: 8px 12px;
+            background: var(--bg-hover);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .preview-header svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .preview-frame {
+            width: 100%;
+            border: none;
+            display: block;
+        }
+        
+        /* Canvas Instructions */
+        .canvas-instructions {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        
+        .canvas-instructions h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .canvas-instructions h4 svg {
+            width: 18px;
+            height: 18px;
+            color: #f0c929;
+        }
+        
+        .canvas-instructions ol {
+            margin: 0;
+            padding-left: 20px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+        
+        .canvas-instructions code {
+            background: var(--bg-hover);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+        
+        /* Info Box */
+        .info-box {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(79, 158, 255, 0.1);
+            border: 1px solid rgba(79, 158, 255, 0.3);
+            border-radius: 8px;
+            margin-top: 24px;
+        }
+        
+        .info-box svg {
+            width: 20px;
+            height: 20px;
+            color: #4f9eff;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .info-box p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 600px) {
+            .generator-main {
+                padding: 24px 16px;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .step-content {
+                padding-left: 0;
+            }
+            
+            .url-input-group {
+                flex-direction: column;
+            }
+            
+            .size-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="generator-container">
+        <header class="generator-header">
+            <a href="index.html" class="back-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12,19 5,12 12,5"/>
+                </svg>
+                Back to Home
+            </a>
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18V5l12-2v13"/>
+                    <circle cx="6" cy="18" r="3"/>
+                    <circle cx="18" cy="16" r="3"/>
+                </svg>
+                <span class="logo-text">TabPlayer</span>
+            </div>
+        </header>
+        
+        <main class="generator-main">
+            <h1 class="page-title">Embed Generator</h1>
+            <p class="page-subtitle">Generate embed code for Canvas LMS or any website</p>
+            
+            <div class="steps-container">
+                <!-- Step 1: Enter File URL -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h2 class="step-title">Enter Guitar Pro File URL</h2>
+                    </div>
+                    <div class="step-content">
+                        <p class="step-description">
+                            Upload your .gp file to Canvas (or any file host) and paste the direct URL below. 
+                            In Canvas, upload to Files, right-click the file, and select "Copy Link Address".
+                        </p>
+                        <div class="url-input-group">
+                            <input type="url" 
+                                   class="url-input" 
+                                   id="fileUrl" 
+                                   placeholder="https://your-canvas.instructure.com/files/12345/download">
+                            <button class="generate-btn" id="generateBtn">Generate Embed</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Choose Size -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h2 class="step-title">Choose Embed Size</h2>
+                    </div>
+                    <div class="step-content">
+                        <div class="size-options">
+                            <label class="size-option">
+                                <input type="radio" name="size" value="small">
+                                <div class="size-label">Small</div>
+                                <div class="size-dims">100% × 400px</div>
+                            </label>
+                            <label class="size-option selected">
+                                <input type="radio" name="size" value="medium" checked>
+                                <div class="size-label">Medium</div>
+                                <div class="size-dims">100% × 550px</div>
+                            </label>
+                            <label class="size-option">
+                                <input type="radio" name="size" value="large">
+                                <div class="size-label">Large</div>
+                                <div class="size-dims">100% × 700px</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Copy Embed Code -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h2 class="step-title">Copy Embed Code</h2>
+                    </div>
+                    <div class="step-content">
+                        <p class="step-description">
+                            Copy this code and paste it into Canvas using the HTML editor (click <code>&lt;/&gt;</code> in the Rich Content Editor).
+                        </p>
+                        <div class="embed-output">
+                            <div class="code-block placeholder" id="embedCode">Enter a file URL above and click "Generate Embed"</div>
+                            <button class="copy-btn" id="copyBtn" style="display: none;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        
+                        <div class="canvas-instructions">
+                            <h4>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="16" x2="12" y2="12"/>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                                </svg>
+                                Canvas LMS Instructions
+                            </h4>
+                            <ol>
+                                <li>In Canvas, go to <strong>Files</strong> and upload your .gp file</li>
+                                <li>Right-click the file → <strong>Copy Link Address</strong></li>
+                                <li>Paste the URL above and click <strong>Generate Embed</strong></li>
+                                <li>In your Page/Assignment, click the <code>&lt;/&gt;</code> HTML editor button</li>
+                                <li>Paste the embed code and save</li>
+                            </ol>
+                        </div>
+                        
+                        <!-- Preview -->
+                        <div class="preview-container" id="previewContainer" style="display: none;">
+                            <div class="preview-header">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                Preview
+                            </div>
+                            <iframe class="preview-frame" id="previewFrame"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <p>
+                    <strong>Hosting the player:</strong> For this to work, the embed.html file must be hosted on a web server accessible to your students. 
+                    You can host it on your own server, GitHub Pages, or any static hosting service. 
+                    Update the iframe src URL to point to your hosted embed.html location.
+                </p>
+            </div>
+            
+            <div class="info-box" style="background: rgba(255, 193, 7, 0.1); border-color: rgba(255, 193, 7, 0.3); margin-top: 16px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #ffc107;">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <p>
+                    <strong>CORS Note:</strong> If the file fails to load due to browser security (CORS), 
+                    the embed player will show an "Upload File Instead" button allowing students to 
+                    manually select the GP file. For best results, host the GP files on the same server as the embed player.
+                </p>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        const sizes = {
+            small: 400,
+            medium: 550,
+            large: 700
+        };
+        
+        const elements = {
+            fileUrl: document.getElementById('fileUrl'),
+            generateBtn: document.getElementById('generateBtn'),
+            embedCode: document.getElementById('embedCode'),
+            copyBtn: document.getElementById('copyBtn'),
+            previewContainer: document.getElementById('previewContainer'),
+            previewFrame: document.getElementById('previewFrame')
+        };
+        
+        // Get the base URL for the embed player
+        const baseUrl = window.location.href.replace('embed-generator.html', 'embed.html');
+        
+        // Size option selection
+        document.querySelectorAll('.size-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.size-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                option.querySelector('input').checked = true;
+                
+                // Regenerate if we have a URL
+                if (elements.fileUrl.value) {
+                    generateEmbed();
+                }
+            });
+        });
+        
+        // Generate embed
+        elements.generateBtn.addEventListener('click', generateEmbed);
+        elements.fileUrl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') generateEmbed();
+        });
+        
+        function generateEmbed() {
+            const fileUrl = elements.fileUrl.value.trim();
+            
+            if (!fileUrl) {
+                alert('Please enter a file URL');
+                return;
+            }
+            
+            // Validate URL
+            try {
+                new URL(fileUrl);
+            } catch {
+                alert('Please enter a valid URL');
+                return;
+            }
+            
+            // Get selected size
+            const selectedSize = document.querySelector('input[name="size"]:checked').value;
+            const height = sizes[selectedSize];
+            
+            // Build embed URL
+            const embedUrl = `${baseUrl}?file=${encodeURIComponent(fileUrl)}`;
+            
+            // Generate iframe code
+            const iframeCode = `<iframe 
+    src="${embedUrl}"
+    width="100%"
+    height="${height}"
+    frameborder="0"
+    allowfullscreen
+    allow="autoplay"
+    style="border-radius: 8px; overflow: hidden;">
+</iframe>`;
+            
+            // Update code display
+            elements.embedCode.textContent = iframeCode;
+            elements.embedCode.classList.remove('placeholder');
+            elements.copyBtn.style.display = 'flex';
+            
+            // Update preview
+            elements.previewContainer.style.display = 'block';
+            elements.previewFrame.style.height = `${height}px`;
+            elements.previewFrame.src = embedUrl;
+        }
+        
+        // Copy to clipboard
+        elements.copyBtn.addEventListener('click', async () => {
+            const code = elements.embedCode.textContent;
+            
+            try {
+                await navigator.clipboard.writeText(code);
+                elements.copyBtn.classList.add('copied');
+                elements.copyBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20,6 9,17 4,12"/>
+                    </svg>
+                    Copied!
+                `;
+                
+                setTimeout(() => {
+                    elements.copyBtn.classList.remove('copied');
+                    elements.copyBtn.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        Copy
+                    `;
+                }, 2000);
+            } catch (err) {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Copied to clipboard!');
+            }
+        });
+    </script>
+</body>
+</html>
+

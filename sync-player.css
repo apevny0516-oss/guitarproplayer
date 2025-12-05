@@ -1,0 +1,354 @@
+/* ===================================
+   Synced Player - Styles
+   =================================== */
+
+.player-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: 
+        radial-gradient(ellipse at 20% 0%, rgba(0, 212, 170, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(255, 107, 107, 0.04) 0%, transparent 50%),
+        var(--bg-primary);
+}
+
+/* ===================================
+   Welcome Screen Enhancements
+   =================================== */
+
+.welcome-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 24px 0 32px;
+    text-align: left;
+}
+
+.welcome-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.welcome-step .step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--accent-subtle);
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+}
+
+.welcome-step span:last-child {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.welcome-step code {
+    background: var(--bg-hover);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--accent-primary);
+}
+
+.create-hint {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.create-hint a {
+    color: var(--accent-primary);
+    text-decoration: none;
+}
+
+.create-hint a:hover {
+    text-decoration: underline;
+}
+
+/* ===================================
+   Audio Files Section in Sidebar
+   =================================== */
+
+.audio-files-section {
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+}
+
+.audio-files-section .sidebar-header {
+    padding: 12px 20px;
+}
+
+.required-files {
+    padding: 0 12px 12px;
+}
+
+.file-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.file-status:last-child {
+    margin-bottom: 0;
+}
+
+.file-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.file-icon.pending {
+    background: var(--bg-hover);
+    color: var(--text-muted);
+}
+
+.file-icon.loaded {
+    background: var(--accent-subtle);
+    color: var(--accent-primary);
+}
+
+.file-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.file-name {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.load-file-btn {
+    padding: 6px 12px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.load-file-btn:hover {
+    background: var(--bg-elevated);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.file-status.loaded .load-file-btn {
+    background: var(--accent-subtle);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+/* ===================================
+   Bar Position Indicator
+   =================================== */
+
+.bar-indicator {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 8px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    z-index: 10;
+}
+
+.bar-current {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+}
+
+.bar-separator {
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+.bar-total {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+/* ===================================
+   Audio Source Badge
+   =================================== */
+
+.audio-source-badge {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 107, 107, 0.05));
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #ff6b6b;
+}
+
+.audio-source-badge.visible {
+    display: flex;
+}
+
+.audio-source-badge svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ===================================
+   Progress Bar with Bar Markers
+   =================================== */
+
+.bar-markers {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.bar-marker-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--accent-primary);
+    opacity: 0.3;
+}
+
+.bar-marker-line:hover {
+    opacity: 0.6;
+}
+
+.bar-marker-line::after {
+    content: attr(data-bar);
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 2px 6px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+.progress-bar:hover .bar-marker-line::after {
+    opacity: 1;
+}
+
+/* ===================================
+   Notation Wrapper Position
+   =================================== */
+
+.notation-wrapper {
+    position: relative;
+}
+
+/* ===================================
+   Control Button Variants
+   =================================== */
+
+#prevBarBtn,
+#nextBarBtn {
+    width: 40px;
+    height: 40px;
+}
+
+#prevBarBtn svg,
+#nextBarBtn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===================================
+   Responsive Adjustments
+   =================================== */
+
+@media (max-width: 768px) {
+    .audio-files-section {
+        position: fixed;
+        bottom: calc(var(--footer-height) + var(--progress-height));
+        left: 0;
+        right: 0;
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
+        padding: 12px;
+        z-index: 100;
+    }
+    
+    .audio-files-section .sidebar-header {
+        display: none;
+    }
+    
+    .required-files {
+        display: flex;
+        gap: 8px;
+        padding: 0;
+    }
+    
+    .file-status {
+        flex: 1;
+        margin: 0;
+    }
+    
+    .bar-indicator {
+        top: 8px;
+        right: 8px;
+        padding: 6px 10px;
+    }
+    
+    .bar-current {
+        font-size: 1.2rem;
+    }
+}
+

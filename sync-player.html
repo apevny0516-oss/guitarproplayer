@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synced Player - TabPlayer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="sync-player.css">
+    <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
+</head>
+<body>
+    <div class="player-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18V5l12-2v13"/>
+                    <circle cx="6" cy="18" r="3"/>
+                    <circle cx="18" cy="16" r="3"/>
+                </svg>
+                <span class="logo-text">TabPlayer</span>
+            </div>
+            <div class="track-info">
+                <h1 class="track-title" id="trackTitle">Load a Sync Package</h1>
+                <p class="track-artist" id="trackArtist">Open a .tabsync file to begin</p>
+            </div>
+            <div class="header-actions">
+                <label class="file-input-wrapper">
+                    <input type="file" id="syncFileInput" accept=".tabsync,.json" hidden>
+                    <span class="file-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17,8 12,3 7,8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Open Sync
+                    </span>
+                </label>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Track Selector Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <h2>Tracks</h2>
+                </div>
+                <div class="track-list" id="trackList">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                        <p>No tracks loaded</p>
+                    </div>
+                </div>
+                
+                <!-- Audio Files Section -->
+                <div class="audio-files-section" id="audioFilesSection" style="display: none;">
+                    <div class="sidebar-header">
+                        <h2>Required Files</h2>
+                    </div>
+                    <div class="required-files">
+                        <div class="file-status" id="gpFileStatus">
+                            <div class="file-icon pending">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14,2 14,8 20,8"/>
+                                </svg>
+                            </div>
+                            <div class="file-info">
+                                <span class="file-label">Guitar Pro</span>
+                                <span class="file-name" id="gpFileName">—</span>
+                            </div>
+                            <label class="load-file-btn">
+                                <input type="file" id="gpFileInput" accept=".gp,.gp3,.gp4,.gp5,.gpx" hidden>
+                                <span>Load</span>
+                            </label>
+                        </div>
+                        <div class="file-status" id="audioFileStatus">
+                            <div class="file-icon pending">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                </svg>
+                            </div>
+                            <div class="file-info">
+                                <span class="file-label">Audio</span>
+                                <span class="file-name" id="audioFileName">—</span>
+                            </div>
+                            <label class="load-file-btn">
+                                <input type="file" id="audioFileInput" accept="audio/*" hidden>
+                                <span>Load</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Notation Display -->
+            <div class="notation-wrapper">
+                <div class="notation-container" id="alphaTab">
+                    <div class="welcome-screen" id="welcomeScreen">
+                        <div class="welcome-content">
+                            <div class="welcome-icon">
+                                <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect x="8" y="10" width="64" height="60" rx="4"/>
+                                    <line x1="8" y1="25" x2="72" y2="25"/>
+                                    <line x1="8" y1="35" x2="72" y2="35"/>
+                                    <line x1="8" y1="45" x2="72" y2="45"/>
+                                    <line x1="8" y1="55" x2="72" y2="55"/>
+                                    <circle cx="25" cy="30" r="3" fill="currentColor"/>
+                                    <circle cx="45" cy="40" r="3" fill="currentColor"/>
+                                    <circle cx="35" cy="50" r="3" fill="currentColor"/>
+                                    <circle cx="55" cy="35" r="3" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <h2>Synced Audio Player</h2>
+                            <p>Play Guitar Pro tabs synced with real audio recordings</p>
+                            <div class="welcome-steps">
+                                <div class="welcome-step">
+                                    <span class="step-num">1</span>
+                                    <span>Open a <code>.tabsync</code> file</span>
+                                </div>
+                                <div class="welcome-step">
+                                    <span class="step-num">2</span>
+                                    <span>Load the GP & audio files</span>
+                                </div>
+                                <div class="welcome-step">
+                                    <span class="step-num">3</span>
+                                    <span>Play with real audio!</span>
+                                </div>
+                            </div>
+                            <button class="welcome-btn" onclick="document.getElementById('syncFileInput').click()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17,8 12,3 7,8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                Open Sync File
+                            </button>
+                            <p class="create-hint">
+                                Don't have a sync file? <a href="editor.html">Create one in the Sync Editor</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bar Position Indicator -->
+                <div class="bar-indicator" id="barIndicator">
+                    <span class="bar-current" id="currentBar">—</span>
+                    <span class="bar-separator">/</span>
+                    <span class="bar-total" id="totalBars">—</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Player Controls -->
+        <footer class="player-controls">
+            <div class="controls-left">
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span class="time-separator">/</span>
+                    <span id="totalTime">0:00</span>
+                </div>
+                <div class="audio-source-badge" id="audioSourceBadge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                    </svg>
+                    <span>Real Audio</span>
+                </div>
+            </div>
+
+            <div class="controls-center">
+                <button class="control-btn" id="stopBtn" title="Stop">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="6" width="12" height="12" rx="1"/>
+                    </svg>
+                </button>
+                <button class="control-btn" id="prevBarBtn" title="Previous Bar">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="19,20 9,12 19,4"/>
+                        <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+                <button class="control-btn play-btn" id="playPauseBtn" title="Play/Pause">
+                    <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5,3 19,12 5,21"/>
+                    </svg>
+                    <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                        <rect x="6" y="4" width="4" height="16" rx="1"/>
+                        <rect x="14" y="4" width="4" height="16" rx="1"/>
+                    </svg>
+                </button>
+                <button class="control-btn" id="nextBarBtn" title="Next Bar">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5,4 15,12 5,20"/>
+                        <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+                <button class="control-btn" id="loopBtn" title="Loop Selection">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="17,1 21,5 17,9"/>
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                        <polyline points="7,23 3,19 7,15"/>
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="controls-right">
+                <div class="tempo-control">
+                    <label>Speed</label>
+                    <div class="tempo-slider-wrapper">
+                        <input type="range" id="tempoSlider" min="25" max="150" value="100">
+                        <span id="tempoValue">100%</span>
+                    </div>
+                </div>
+                <div class="volume-control">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                    </svg>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="80">
+                </div>
+            </div>
+        </footer>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-cursor" id="progressCursor"></div>
+                <!-- Bar markers will be added here -->
+                <div class="bar-markers" id="barMarkers"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p id="loadingText">Loading...</p>
+    </div>
+
+    <script src="sync-player.js"></script>
+</body>
+</html>
+

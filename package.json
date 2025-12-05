@@ -1,0 +1,22 @@
+{
+  "name": "guitar-pro-tab-player",
+  "version": "1.0.0",
+  "description": "A Guitar Pro notation player that displays and plays .gp files",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve ."
+  },
+  "keywords": [
+    "guitar",
+    "tab",
+    "tablature",
+    "music",
+    "notation",
+    "guitar-pro"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
+
