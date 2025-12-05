@@ -97,9 +97,10 @@
         .notation-area {
             flex: 1;
             overflow-x: auto;
-            overflow-y: hidden;
+            overflow-y: auto;
             background: var(--bg);
             position: relative;
+            min-height: 0;
         }
         
         .notation-area::-webkit-scrollbar {
@@ -224,13 +225,17 @@
         }
         
         .at-cursor-bar {
-            background: rgba(100, 100, 100, 0.08) !important;
+            background: rgba(100, 100, 100, 0.1) !important;
         }
         
         .at-cursor-beat {
-            background: #4a4a4a !important;
-            opacity: 0.4;
+            background: #e74c3c !important;
+            opacity: 0.9 !important;
             width: 3px !important;
+        }
+        
+        .at-highlight * {
+            fill: #e74c3c !important;
         }
         
         .at-selection div {
@@ -238,7 +243,7 @@
         }
         
         .at-main {
-            padding: 12px 16px !important;
+            padding: 16px 20px !important;
         }
     </style>
 </head>
@@ -329,15 +334,15 @@
                     display: {
                         staveProfile: 'Default',
                         layoutMode: 'Horizontal',
-                        scale: 1.0,
+                        scale: 0.9,
                         stretchForce: 0.6,
                         resources: {
-                            staffLineColor: '#999999',
-                            barSeparatorColor: '#999999',
+                            staffLineColor: '#888888',
+                            barSeparatorColor: '#888888',
                             mainGlyphColor: '#333333',
-                            secondaryGlyphColor: '#666666',
+                            secondaryGlyphColor: '#555555',
                             scoreInfoColor: '#333333',
-                            barNumberColor: '#999999'
+                            barNumberColor: '#888888'
                         }
                     },
                     notation: {
@@ -368,8 +373,15 @@
                     this.elements.loadingState.style.display = 'none';
                 });
                 
+                this.api.renderFinished.on(() => {
+                    // Notify parent of required height for auto-sizing iframes
+                    this.notifyHeight();
+                });
+                
                 this.api.playerReady.on(() => {
                     this.elements.playBtn.disabled = false;
+                    // Enable metronome by default
+                    this.api.metronomeVolume = 1;
                 });
                 
                 this.api.playerStateChanged.on((e) => {
@@ -469,6 +481,21 @@
                 this.elements.loadingState.style.display = 'none';
                 this.elements.errorState.style.display = 'flex';
                 this.elements.errorMessage.textContent = message;
+            }
+            
+            notifyHeight() {
+                // Get the actual rendered height needed
+                const surface = this.elements.container.querySelector('.at-surface');
+                if (surface) {
+                    const height = surface.offsetHeight + 40; // Add padding
+                    // Post message to parent for auto-height iframes
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'tabplayer-resize',
+                            height: height
+                        }, '*');
+                    }
+                }
             }
         }
         
