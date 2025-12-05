@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TabPlayer Mini</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --border: #e5e5e5;
+            --text: #333333;
+            --accent: #4a4a4a;
+            --play-bg: #f5f5f0;
+            --play-hover: #eaeae5;
+            --selection: rgba(255, 200, 50, 0.3);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        
+        .mini-player {
+            display: flex;
+            height: 100%;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--bg);
+        }
+        
+        /* Play Button */
+        .play-column {
+            width: 60px;
+            min-width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--play-bg);
+            border-right: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        
+        .play-column:hover {
+            background: var(--play-hover);
+        }
+        
+        .play-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--accent);
+        }
+        
+        .play-btn svg {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.1s;
+        }
+        
+        .play-column:hover .play-btn svg {
+            transform: scale(1.1);
+        }
+        
+        .play-btn .pause-icon {
+            display: none;
+        }
+        
+        .play-btn.playing .play-icon {
+            display: none;
+        }
+        
+        .play-btn.playing .pause-icon {
+            display: block;
+        }
+        
+        /* Notation Area */
+        .notation-area {
+            flex: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            background: var(--bg);
+            position: relative;
+        }
+        
+        .notation-area::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .notation-area::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+        
+        .notation-area::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+        
+        .notation-area::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+        
+        /* Loading State */
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-size: 0.85rem;
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e0e0e0;
+            border-top-color: #666;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-size: 0.85rem;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .upload-btn {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: var(--accent);
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .upload-btn:hover {
+            background: #333;
+        }
+        
+        /* Footer */
+        .mini-footer {
+            position: absolute;
+            bottom: 8px;
+            left: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            color: #999;
+        }
+        
+        .mini-footer svg {
+            width: 14px;
+            height: 14px;
+            color: #f5a623;
+        }
+        
+        .mini-footer span {
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+        
+        /* Loop indicator */
+        .loop-indicator {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(255, 200, 50, 0.9);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .loop-indicator.visible {
+            display: flex;
+        }
+        
+        .loop-indicator svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        /* AlphaTab Overrides */
+        .at-surface {
+            background: transparent !important;
+        }
+        
+        .at-cursor-bar {
+            background: rgba(100, 100, 100, 0.08) !important;
+        }
+        
+        .at-cursor-beat {
+            background: #4a4a4a !important;
+            opacity: 0.4;
+            width: 3px !important;
+        }
+        
+        .at-selection div {
+            background: var(--selection) !important;
+        }
+        
+        .at-main {
+            padding: 12px 16px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="mini-player">
+        <!-- Play Button Column -->
+        <div class="play-column" id="playColumn">
+            <button class="play-btn" id="playBtn">
+                <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5,3 19,12 5,21"/>
+                </svg>
+                <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16"/>
+                    <rect x="14" y="4" width="4" height="16"/>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Notation Area -->
+        <div class="notation-area" id="alphaTab">
+            <div class="loading-state" id="loadingState">
+                <div class="spinner"></div>
+                <span>Loading...</span>
+            </div>
+            <div class="error-state" id="errorState">
+                <span id="errorMessage">Failed to load</span>
+                <input type="file" id="fileInput" accept=".gp,.gp3,.gp4,.gp5,.gpx" hidden>
+                <button class="upload-btn" id="uploadBtn">Upload File</button>
+            </div>
+            
+            <!-- Loop Indicator -->
+            <div class="loop-indicator" id="loopIndicator">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="17,1 21,5 17,9"/>
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                    <polyline points="7,23 3,19 7,15"/>
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                </svg>
+                <span>LOOP</span>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="mini-footer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18V5l12-2v13"/>
+                <circle cx="6" cy="18" r="3"/>
+                <circle cx="18" cy="16" r="3"/>
+            </svg>
+            <span>TABPLAYER</span>
+        </div>
+    </div>
+
+    <script>
+        class MiniPlayer {
+            constructor() {
+                this.api = null;
+                this.isPlaying = false;
+                this.hasSelection = false;
+                
+                this.elements = {
+                    container: document.getElementById('alphaTab'),
+                    loadingState: document.getElementById('loadingState'),
+                    errorState: document.getElementById('errorState'),
+                    errorMessage: document.getElementById('errorMessage'),
+                    playColumn: document.getElementById('playColumn'),
+                    playBtn: document.getElementById('playBtn'),
+                    loopIndicator: document.getElementById('loopIndicator'),
+                    fileInput: document.getElementById('fileInput'),
+                    uploadBtn: document.getElementById('uploadBtn')
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.initAlphaTab();
+                this.bindEvents();
+                this.loadFileFromUrl();
+            }
+            
+            initAlphaTab() {
+                const settings = {
+                    core: {
+                        fontDirectory: 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/font/',
+                        file: null
+                    },
+                    display: {
+                        staveProfile: 'Default',
+                        layoutMode: 'Horizontal',
+                        scale: 1.0,
+                        stretchForce: 0.6,
+                        resources: {
+                            staffLineColor: '#999999',
+                            barSeparatorColor: '#999999',
+                            mainGlyphColor: '#333333',
+                            secondaryGlyphColor: '#666666',
+                            scoreInfoColor: '#333333',
+                            barNumberColor: '#999999'
+                        }
+                    },
+                    notation: {
+                        elements: {
+                            scoreTitle: false,
+                            scoreSubTitle: false,
+                            scoreArtist: false,
+                            scoreAlbum: false,
+                            scoreWords: false,
+                            scoreMusic: false,
+                            scoreCopyright: false,
+                            guitarTuning: false
+                        }
+                    },
+                    player: {
+                        enablePlayer: true,
+                        enableCursor: true,
+                        enableUserInteraction: true,
+                        soundFont: 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/soundfont/sonivox.sf2',
+                        scrollElement: this.elements.container,
+                        scrollMode: 'Continuous'
+                    }
+                };
+                
+                this.api = new alphaTab.AlphaTabApi(this.elements.container, settings);
+                
+                this.api.scoreLoaded.on(() => {
+                    this.elements.loadingState.style.display = 'none';
+                });
+                
+                this.api.playerReady.on(() => {
+                    this.elements.playBtn.disabled = false;
+                });
+                
+                this.api.playerStateChanged.on((e) => {
+                    this.isPlaying = e.state === 1;
+                    this.elements.playBtn.classList.toggle('playing', this.isPlaying);
+                });
+                
+                this.api.playbackRangeChanged.on((args) => {
+                    this.onSelectionChanged(args);
+                });
+                
+                this.api.error.on((e) => {
+                    this.showError(e.message || 'Failed to load');
+                });
+            }
+            
+            bindEvents() {
+                // Play/pause
+                this.elements.playColumn.addEventListener('click', () => {
+                    if (this.api) this.api.playPause();
+                });
+                
+                // File upload fallback
+                this.elements.uploadBtn.addEventListener('click', () => {
+                    this.elements.fileInput.click();
+                });
+                
+                this.elements.fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) this.loadLocalFile(file);
+                });
+                
+                // Keyboard
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        if (this.api) this.api.playPause();
+                    }
+                    if (e.code === 'Escape' && this.hasSelection) {
+                        this.clearSelection();
+                    }
+                });
+            }
+            
+            loadFileFromUrl() {
+                const params = new URLSearchParams(window.location.search);
+                const fileUrl = params.get('file');
+                
+                if (!fileUrl) {
+                    this.showError('No file specified');
+                    return;
+                }
+                
+                try {
+                    this.api.load(fileUrl);
+                } catch (err) {
+                    this.showError('Failed to load file');
+                }
+            }
+            
+            loadLocalFile(file) {
+                this.elements.errorState.style.display = 'none';
+                this.elements.loadingState.style.display = 'flex';
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.api.load(new Uint8Array(e.target.result));
+                };
+                reader.onerror = () => this.showError('Failed to read file');
+                reader.readAsArrayBuffer(file);
+            }
+            
+            onSelectionChanged(args) {
+                if (args.playbackRange && 
+                    args.playbackRange.startTick >= 0 && 
+                    args.playbackRange.endTick > args.playbackRange.startTick) {
+                    // Selection made - enable looping
+                    this.hasSelection = true;
+                    this.api.isLooping = true;
+                    this.elements.loopIndicator.classList.add('visible');
+                } else {
+                    // No selection - disable looping
+                    this.hasSelection = false;
+                    this.api.isLooping = false;
+                    this.elements.loopIndicator.classList.remove('visible');
+                }
+            }
+            
+            clearSelection() {
+                this.api.playbackRange = null;
+                this.hasSelection = false;
+                this.api.isLooping = false;
+                this.elements.loopIndicator.classList.remove('visible');
+            }
+            
+            showError(message) {
+                this.elements.loadingState.style.display = 'none';
+                this.elements.errorState.style.display = 'flex';
+                this.elements.errorMessage.textContent = message;
+            }
+        }
+        
+        new MiniPlayer();
+    </script>
+</body>
+</html>
+
