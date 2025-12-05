@@ -363,7 +363,9 @@
                         enableUserInteraction: true,
                         soundFont: 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/soundfont/sonivox.sf2',
                         scrollElement: this.elements.container,
-                        scrollMode: 'Continuous'
+                        scrollMode: 'Continuous',
+                        scrollOffsetX: -200,  // Keep cursor more to the right, showing more notation on left
+                        scrollSpeed: 300      // Smooth scrolling speed
                     }
                 };
                 
